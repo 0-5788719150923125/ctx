@@ -11,6 +11,8 @@ We expose the following environment variables:
 ```
 ## a comma-delimited string, containing channel names you will subscribe to
 CHANNELS = "channel1,channel2,channel3"
+## whether or not to expose a web-based terminal interface at http://localhost:9666
+WEBUI = enabled/disabled
 ```
 
 ## API
@@ -50,3 +52,9 @@ The API expects to receive a JSON object with two properties:
 ```
 {"seed": "myString"}
 ```
+
+### GUN
+
+This API also exposes a [GUN](https://gun.eco/) server at the following endpoint:
+
+`http://localhost:9666/gun`

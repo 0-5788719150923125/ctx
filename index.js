@@ -10,6 +10,7 @@ import 'gun/lib/open.js'
 
 // User config options
 const port = process.env.PORT || 9666
+const UI = process.env.WEBUI || 'disabled'
 
 let channels = ['hive']
 if (process.env.CHANNELS) {
@@ -28,6 +29,14 @@ const app = express()
 const server = app.listen(port, () => {
     console.log(`The stem is exposed on port: ${port}`)
 })
+
+// Enable the web UI
+if (UI === 'enabled') {
+    app.use(express.static('/src/public/dist'))
+    app.get('/', (req, res) => {
+        res.sendFile('/src/public/dist/index.html')
+    })
+}
 
 // Connect to the hivemind
 const gun = Gun({

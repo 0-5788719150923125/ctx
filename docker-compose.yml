@@ -8,5 +8,6 @@ services:
       dockerfile: Dockerfile
     environment:
       CHANNELS: 'hive,support,opencog'
+      WEBUI: enabled
     ports:
       - 9666:9666
