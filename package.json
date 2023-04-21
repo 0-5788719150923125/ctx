@@ -1,0 +1,19 @@
+{
+  "name": "src",
+  "version": "0.1.0",
+  "description": "an api",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "author": "No-One",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "gun": "^0.2020.1239"
+  },
+  "devDependencies": {
+    "prettier": "^2.8.7"
+  }
+}

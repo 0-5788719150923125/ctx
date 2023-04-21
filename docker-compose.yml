@@ -1,0 +1,12 @@
+version: '3.9'
+
+services:
+  api:
+    image: ghcr.io/0-5788719150923125/src:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      CHANNELS: 'hive,support,opencog'
+    ports:
+      - 9666:9666
