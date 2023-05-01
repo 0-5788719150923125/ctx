@@ -11,6 +11,7 @@ import 'gun/lib/open.js'
 // User config options
 const port = process.env.PORT || 9666
 const UI = process.env.WEBUI || 'disabled'
+const anonymous = process.env.ANONYMOUS || 'false'
 
 let channels = ['hive']
 if (process.env.CHANNELS) {
@@ -84,6 +85,7 @@ async function cockpit(identity, identifier) {
     console.log('identity :> [REDACTED]')
     console.log('identifier :> ' + identifier)
     console.log('loading into cockpit')
+    if (anonymous === 'true') return
     await authenticateUser(identity, identifier)
 }
 
@@ -143,8 +145,11 @@ for (const hand of channels) {
             let pubKey = null
             if (user) {
                 try {
-                    const signed = await SEA.sign(message, pair)
-                    pubKey = pair.pub
+                    let signed = null
+                    if (anonymous === 'false') {
+                        signed = await SEA.sign(message, pair)
+                        pubKey = pair.pub
+                    }
                     message = signed
                 } catch {
                     // pass

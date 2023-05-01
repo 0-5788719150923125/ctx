@@ -13,6 +13,8 @@ We expose the following environment variables:
 CHANNELS = "channel1,channel2,channel3"
 ## whether or not to expose a web-based terminal interface at http://localhost:9666
 WEBUI = enabled/disabled
+## whether or not to use an authenticated GUN user or not
+ANONYMOUS = "true/false"
 ```
 
 ## API

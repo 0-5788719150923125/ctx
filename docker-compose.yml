@@ -9,5 +9,6 @@ services:
     environment:
       CHANNELS: 'hive,support,opencog'
       WEBUI: enabled
+      ANONYMOUS: 'true'
     ports:
       - 9666:9666
