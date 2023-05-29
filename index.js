@@ -13,16 +13,6 @@ const port = process.env.PORT || 9666
 const UI = process.env.WEBUI || 'disabled'
 const anonymous = process.env.ANONYMOUS || 'false'
 
-let channels = ['hive']
-if (process.env.CHANNELS) {
-    const combined = process.env.CHANNELS.split(',').concat(channels)
-    const uniqueSet = new Set(combined)
-    channels = [...uniqueSet]
-}
-
-console.log('subscribing to the following channels:')
-console.log(channels)
-
 // Start a web server
 const app = express()
 
@@ -96,13 +86,12 @@ app.use(express.json())
 
 // Capture every message published at every configured channel
 const listeners = {}
-for (const hand of channels) {
-    const channel = {}
-    listeners[hand] = channel
-    channel['gun'] = gun
+app.get(`/channel*`, (req, res) => {
+    const neuron = req.originalUrl.slice(9)
+    listeners[neuron] = gun
         .get('messaging')
         .get('channels')
-        .get(hand)
+        .get(neuron)
         .on(async (node) => {
             try {
                 if (typeof node.payload === 'string') {
@@ -123,22 +112,16 @@ for (const hand of channels) {
                     } else {
                         message = bullet.message
                     }
-                    channel['bullet'] = {
+                    res.json({
                         message: message.toString(),
                         identifier: bullet.identifier
-                    }
+                    })
                 }
-            } catch (err) {
-                console.error(err)
+            } catch {
+                // Pass
             }
         })
-    // Publish messages at these routes
-    app.get(`/channel/${hand}`, (req, res) => {
-        res.json(channel['bullet'])
-    })
-
-    // Receive messages from vtx at these routes
-    app.post(`/message/${hand}`, async (req, res) => {
+    app.post(`/message/${neuron}`, async (req, res) => {
         try {
             // Destructure and sign message
             let { message, identifier } = req.body
@@ -157,14 +140,14 @@ for (const hand of channels) {
             }
             // Send message to GUN
             const bullet = JSON.stringify({ identifier, message, pubKey })
-            channel['gun'].get('payload').put(bullet)
+            listeners[neuron].get('payload').put(bullet)
         } catch (err) {
             console.error(err)
             cockpit(identity, identifier)
         }
         res.json('ok')
     })
-}
+})
 
 // Hash strings into daemon names at this route
 app.get('/daemon', (req, res) => {

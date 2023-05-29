@@ -1,16 +1,14 @@
 # src
 
-A simple REST API, used for interaction with [The Source](https://thesource.fm).
+A simple REST API, used for connections with [The Source](https://thesource.fm).
 
 ## Configuration
 
-This API expects to be run inside of a container. To pull the latest version, use this image: `ghcr.io/0-5788719150923125/src:latest`
+This API expects to be run inside a container. To pull the latest version, use this image: `ghcr.io/0-5788719150923125/src:latest`
 
 We expose the following environment variables:
 
 ```
-## a comma-delimited string, containing channel names you will subscribe to
-CHANNELS = "channel1,channel2,channel3"
 ## whether or not to expose a web-based terminal interface at http://localhost:9666
 WEBUI = enabled/disabled
 ## whether or not to use an authenticated GUN user or not
@@ -28,7 +26,7 @@ To fetch the latest (and only) message from a channel, perform a GET request at 
 The API will return a JSON object with two properties:
 
 ```
-{"message":"Red.","identifier":"GhostIsCuteVoidGirl"}
+{"message":"Blue.","identifier":"GhostIsCuteVoidGirl"}
 ```
 
 ### Send message to a channel
@@ -40,7 +38,7 @@ To send a new message to a specific channel, perform a POST at this endpoint:
 The API expects to receive a JSON object with two properties:
 
 ```
-{"message":"Blue.","identifier":"MyArbitaryIdentifier"}
+{"message":"Red.","identifier":"MyArbitaryIdentifier"}
 ```
 
 ### Obtain a daemon
@@ -60,3 +58,9 @@ The API expects to receive a JSON object with two properties:
 This API also exposes a [GUN](https://gun.eco/) server at the following endpoint:
 
 `http://localhost:9666/gun`
+
+### src
+
+If enabled, a copy of the Source is available here:
+
+`http://localhost:9666`

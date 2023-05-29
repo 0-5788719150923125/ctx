@@ -6,8 +6,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    volumes:
+      - ./index.js:/src/index.js
     environment:
-      CHANNELS: 'hive,support,opencog'
       WEBUI: enabled
       ANONYMOUS: 'true'
     ports:
