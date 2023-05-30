@@ -17,11 +17,11 @@ ANONYMOUS = "true/false"
 
 ## API
 
-### Read messages from a channel
+### Read bullets from a neuron
 
-To fetch the latest (and only) message from a channel, perform a GET request at this endpoint:
+To fetch the latest (and only) bullet from a channel, perform a GET request at this endpoint:
 
-`http://localhost:9666/channel/{CHANNELNAME}`
+`http://localhost:9666/receive/{NEURONNAME}`
 
 The API will return a JSON object with two properties:
 
@@ -29,11 +29,11 @@ The API will return a JSON object with two properties:
 {"message":"Blue.","identifier":"GhostIsCuteVoidGirl"}
 ```
 
-### Send message to a channel
+### Send bullets to a neuron
 
-To send a new message to a specific channel, perform a POST at this endpoint:
+To send a new bullet to a specific neuron, perform a POST at this endpoint:
 
-`http://localhost:9666/message/{CHANNELNAME}`
+`http://localhost:9666/send/{NEURONNAME}`
 
 The API expects to receive a JSON object with two properties:
 
@@ -55,7 +55,7 @@ The API expects to receive a JSON object with two properties:
 
 ### GUN
 
-This API also exposes a [GUN](https://gun.eco/) server at the following endpoint:
+This API exposes a [GUN](https://gun.eco/) server at the following endpoint:
 
 `http://localhost:9666/gun`
 

@@ -86,11 +86,10 @@ app.use(express.json())
 
 // Capture every message published at every configured channel
 const listeners = {}
-app.get(`/channel*`, (req, res) => {
+app.get(`/receive*`, (req, res) => {
     const neuron = req.originalUrl.slice(9)
     listeners[neuron] = gun
-        .get('messaging')
-        .get('channels')
+        .get('neurons')
         .get(neuron)
         .on(async (node) => {
             try {
@@ -121,7 +120,7 @@ app.get(`/channel*`, (req, res) => {
                 // Pass
             }
         })
-    app.post(`/message/${neuron}`, async (req, res) => {
+    app.post(`/send/${neuron}`, async (req, res) => {
         try {
             // Destructure and sign message
             let { message, identifier } = req.body
