@@ -31,11 +31,7 @@ if (UI === 'enabled') {
 
 // Connect to the hivemind
 const gun = Gun({
-    peers: [
-        'http://ctx:9666/gun',
-        'https://59.src.eco/gun',
-        'https://jksfs798zfzb9c3nc3e38c7nr83cnn8rz.onrender.com/'
-    ],
+    peers: ['https://59.src.eco/gun'],
     web: server,
     file: `/tmp/${randomString(8)}`,
     localStorage: false,
