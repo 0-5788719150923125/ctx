@@ -93,8 +93,8 @@ app.get(`/receive*`, (req, res) => {
         .get(focus)
         .on(async (node) => {
             try {
-                if (typeof node.payload === 'string') {
-                    const bullet = JSON.parse(node.payload)
+                if (typeof node === 'string') {
+                    const bullet = JSON.parse(node)
                     let message = 'ERROR: Me Found.'
                     if (
                         bullet.pubKey !== null &&
@@ -144,7 +144,7 @@ app.get(`/receive*`, (req, res) => {
             }
             // Send message to GUN
             const bullet = JSON.stringify({ identifier, message, pubKey, mode })
-            listeners[focus].get('payload').put(bullet)
+            listeners[focus].put(bullet)
         } catch (err) {
             console.error(err)
             cockpit(identity, identifier)
