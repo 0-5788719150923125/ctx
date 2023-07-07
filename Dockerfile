@@ -10,7 +10,7 @@ COPY package*.json *.js ./
 
 RUN npm install --production
 
-RUN curl -sSL "https://gitlab.com/the-resistance/thesource.fm/-/jobs/artifacts/master/download?job=modules" -o public.zip \
+RUN curl -sSL "https://gitlab.com/the-resistance/src.eco/-/jobs/artifacts/master/download?job=modules" -o public.zip \
     && unzip public.zip -d public \
     && rm public.zip
 

@@ -6,10 +6,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    network_mode: 'host'
     volumes:
       - ./index.js:/src/index.js
     environment:
       WEBUI: enabled
       ANONYMOUS: 'true'
-    ports:
-      - 9667:9666
+    # ports:
+    #   - 9667:9666
