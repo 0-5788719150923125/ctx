@@ -1,6 +1,6 @@
 # src
 
-A simple REST API, used for connections with [The Source](https://thesource.fm).
+A simple websockets API, used for connections to [The Source](https://src.eco).
 
 ## Configuration
 
@@ -17,47 +17,83 @@ ANONYMOUS = "true/false"
 
 ## API
 
-### Read bullets from a neuron
+To fetch and receive updates from this service, one must open a websocket connection to this endpoint:
 
-To fetch the latest (and only) bullet from a channel, perform a GET request at this endpoint:
+`ws://localhost:9666/wss`
 
-`http://localhost:9666/receive/{NEURONNAME}`
+### Subscribe to a channel
 
-The API will return a JSON object with two properties:
+To tell the container to listen for updates on a particular channel, send a UTF-8 encoded JSON payload containing a "focus" property. Here is a Python example:
+
+```py
+await websocket.send(json.dumps({"focus": "trade"}).encode("utf-8"))
+```
+
+### Receive updates from a channel
+
+After subscription, you will begin to receive updates from the API. Here is an example of how to handle them in Python:
+
+```py
+async with websockets.connect("ws://localhost:9666/wss") as websocket:
+    response = await websocket.recv()
+    print(json.loads(response))
+```
+
+The API will respond with a payload containing 3 properties:
 
 ```
-{"message":"Blue.","identifier":"GhostIsCuteVoidGirl"}
+{
+    focus: "trade",          # the channel
+    message: "hello world",  # the message itself
+    identifier: "1234"       # the ID of the sender
+}
 ```
 
-### Send bullets to a neuron
+# Send a message to the API
 
-To send a new bullet to a specific neuron, perform a POST at this endpoint:
+To send a message to the network, you must send a UTF-8 encoded JSON payload containing 4 properties. Here is another Python example:
 
-`http://localhost:9666/send/{NEURONNAME}`
-
-The API expects to receive a JSON object with two properties:
-
-```
-{"message":"Red.","identifier":"MyArbitaryIdentifier"}
+```py
+ws = websocket.WebSocket()
+ws.connect("ws://localhost:9666/wss")
+ws.send(
+    json.dumps(
+        {
+            "message": "hello world",
+            "identifier": "1234",
+            "focus": "trade",
+            "mode": "cos",
+        }
+    ).encode("utf-8")
+)
+ws.close()
 ```
 
 ### Obtain a daemon
 
-This API also exposes a function that takes any arbitrary string, and returns a deterministic hash (a "daemon name"). To use it, send a GET request to this endpoint:
+This API also exposes a function that takes any arbitrary string, and returns a deterministic hash (a "daemon name"). To use it, send a UTF-8 encoded JSON payload to this endpoint:
 
-`http://localhost:9666/daemon`
+`http://localhost:9666/wss`
 
-The API expects to receive a JSON object with two properties:
+The API expects to receive a JSON object with one property. It will return a single property.:
 
+```py
+import websocket
+
+def get_daemon(seed):
+    ws = websocket.WebSocket()
+    ws.connect("ws://localhost:9666/wss")
+    ws.send(json.dumps({"seed": seed}).encode("utf-8"))
+    response = ws.recv()
+    ws.close()
+    return json.loads(response)["name"]
 ```
-{"seed": "myString"}
-```
 
-### GUN
+### ~~GUN~~
 
-This API exposes a [GUN](https://gun.eco/) server at the following endpoint:
+~~This API exposes a [GUN](https://gun.eco/) server at the following endpoint:~~
 
-`http://localhost:9666/gun`
+~~`http://localhost:9666/gun`~~
 
 ### src
 

@@ -126,7 +126,7 @@ if (UI === 'enabled') {
 
 // // Connect to the hivemind
 const gun = Gun({
-    peers: ['https://59.src.eco/gun'],
+    peers: ['https://59.src.eco/gun', 'https://95.src.eco/gun'],
     file: `/tmp/gun`,
     server,
     localStorage: false,
