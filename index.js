@@ -22,6 +22,24 @@ const server = app.listen(port, () => {
     console.log(`The stem is exposed on port: ${port}`)
 })
 
+// // Connect to the hivemind
+const gun = Gun({
+    peers: ['https://59.src.eco/gun', 'https://95.src.eco/gun'],
+    file: `/tmp/gun`,
+    server,
+    localStorage: false,
+    radisk: true,
+    axe: false
+})
+
+// Enable the web UI
+if (UI === 'enabled') {
+    app.use(express.static('/src/public/dist'))
+    app.get('/', (req, res) => {
+        res.sendFile('/src/public/dist/index.html')
+    })
+}
+
 const ws = new WebSocketServer({ server, path: '/wss' })
 
 const listeners = {}
@@ -114,24 +132,6 @@ ws.on('connection', async (ws, request) => {
     ws.on('close', (code, reason) => {
         ws.close()
     })
-})
-
-// Enable the web UI
-if (UI === 'enabled') {
-    app.use(express.static('/src/public/dist'))
-    app.get('/', (req, res) => {
-        res.sendFile('/src/public/dist/index.html')
-    })
-}
-
-// // Connect to the hivemind
-const gun = Gun({
-    peers: ['https://59.src.eco/gun', 'https://95.src.eco/gun'],
-    file: `/tmp/gun`,
-    server,
-    localStorage: false,
-    radisk: true,
-    axe: false
 })
 
 const delay = (ms) => new Promise((res) => setTimeout(res, ms))
