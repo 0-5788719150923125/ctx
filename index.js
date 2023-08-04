@@ -84,7 +84,8 @@ ws.on('connection', async (ws, request) => {
         }
         if (payload.focus) {
             listeners[payload.focus] = gun
-                .get('domain')
+                .get('src')
+                .get('bullets')
                 .get(payload.focus)
                 .on(async (node, key) => {
                     try {
