@@ -37,7 +37,7 @@ const gun = Gun({
 
 gun.get('src').on((data) => {})
 
-function managePeers() {
+async function managePeers() {
     const peers = gun.back('opt.peers')
     for (const i of bootstrapPeers) {
         const state = peers[i]?.wire?.readyState
