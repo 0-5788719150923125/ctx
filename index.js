@@ -15,6 +15,8 @@ const port = process.env.PORT || 9666
 const UI = process.env.WEBUI || 'disabled'
 const anonymous = process.env.ANONYMOUS || 'false'
 
+const delay = (ms) => new Promise((res) => setTimeout(res, ms))
+
 // Start a web server
 const app = express()
 
@@ -23,14 +25,30 @@ const server = app.listen(port, () => {
 })
 
 // // Connect to the hivemind
+const bootstrapPeers = ['wss://59.src.eco/gun', 'wss://95.src.eco/gun']
 const gun = Gun({
-    peers: ['https://59.src.eco/gun', 'https://95.src.eco/gun'],
-    file: `/tmp/gun`,
+    peers: bootstrapPeers,
+    file: `./gun`,
     server,
     localStorage: false,
     radisk: true,
     axe: false
 })
+
+gun.get('src').on((data) => {})
+
+function managePeers() {
+    const peers = gun.back('opt.peers')
+    for (const i of bootstrapPeers) {
+        const state = peers[i]?.wire?.readyState
+        if (state === 0 || state === null || typeof state === 'undefined') {
+            gun.opt({ peers: [...bootstrapPeers] })
+        }
+    }
+    setTimeout(managePeers, 15000)
+}
+
+managePeers()
 
 // Enable the web UI
 if (UI === 'enabled') {
@@ -134,8 +152,6 @@ ws.on('connection', async (ws, request) => {
         ws.close()
     })
 })
-
-const delay = (ms) => new Promise((res) => setTimeout(res, ms))
 
 // Get a random number between two others
 function randomBetween(min, max) {
