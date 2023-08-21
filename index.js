@@ -15,13 +15,11 @@ const port = process.env.PORT || 9666
 const UI = process.env.WEBUI || 'disabled'
 const anonymous = process.env.ANONYMOUS || 'false'
 
-const delay = (ms) => new Promise((res) => setTimeout(res, ms))
-
 // Start a web server
 const app = express()
 
 const server = app.listen(port, () => {
-    console.log(`The stem is exposed on port: ${port}`)
+    console.log(`The src is exposed on port: ${port}`)
 })
 
 // // Connect to the hivemind
@@ -31,7 +29,7 @@ const gun = Gun({
     file: `./gun`,
     server,
     localStorage: false,
-    radisk: true,
+    radisk: false,
     axe: false
 })
 
