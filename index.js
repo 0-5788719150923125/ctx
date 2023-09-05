@@ -36,7 +36,7 @@ if (UI === 'enabled') {
 const ws = new WebSocketServer({ server, path: '/ws' })
 ws.on('connection', async (ws, request) => {
     ws.on('message', async (message) => {
-        await handleMessage(message)
+        await handleMessage(ws, message)
     })
     ws.on('close', (code, reason) => {
         ws.close()
@@ -59,7 +59,7 @@ async function managePeers() {
 managePeers()
 
 const listeners = {}
-async function handleMessage(message) {
+async function handleMessage(ws, message) {
     const payload = JSON.parse(message.toString())
     if (payload.seed) {
         return ws.send(
