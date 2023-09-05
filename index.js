@@ -13,7 +13,7 @@ import 'gun/lib/yson.js'
 // User config options
 const port = process.env.PORT || 9666
 const UI = process.env.WEBUI || 'disabled'
-const anonymous = process.env.ANONYMOUS || 'false'
+const anonymous = process.env.ANONYMOUS || 'true'
 
 // Start a web server
 const app = express()
