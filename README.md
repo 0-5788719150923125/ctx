@@ -8,10 +8,15 @@ This API expects to be run inside a container. To pull the latest version, use t
 
 We expose the following environment variables:
 
-```
-## whether or not to expose a web-based terminal interface at http://localhost:9666
+### whether or not to expose a web-based terminal interface at http://localhost:9666
+
+```sh
 WEBUI = enabled/disabled
-## whether or not to use an authenticated GUN user or not
+```
+
+### whether or not to use an authenticated GUN user or not
+
+```sh
 ANONYMOUS = "true/false"
 ```
 
@@ -19,7 +24,7 @@ ANONYMOUS = "true/false"
 
 To fetch and receive updates from this service, one must open a websocket connection to this endpoint:
 
-`ws://localhost:9666/wss`
+`ws://localhost:9666/ws`
 
 ### Subscribe to a channel
 
@@ -34,7 +39,7 @@ await websocket.send(json.dumps({"focus": "trade"}).encode("utf-8"))
 After subscription, you will begin to receive updates from the API. Here is an example of how to handle them in Python:
 
 ```py
-async with websockets.connect("ws://localhost:9666/wss") as websocket:
+async with websockets.connect("ws://localhost:9666/ws") as websocket:
     response = await websocket.recv()
     print(json.loads(response))
 ```
@@ -55,7 +60,7 @@ To send a message to the network, you must send a UTF-8 encoded JSON payload con
 
 ```py
 ws = websocket.WebSocket()
-ws.connect("ws://localhost:9666/wss")
+ws.connect("ws://localhost:9666/ws")
 ws.send(
     json.dumps(
         {
@@ -73,7 +78,7 @@ ws.close()
 
 This API also exposes a function that takes any arbitrary string, and returns a deterministic hash (a "daemon name"). To use it, send a UTF-8 encoded JSON payload to this endpoint:
 
-`http://localhost:9666/wss`
+`http://localhost:9666/ws`
 
 The API expects to receive a JSON object with one property. It will return a single property.:
 
@@ -94,6 +99,8 @@ def get_daemon(seed):
 ~~This API exposes a [GUN](https://gun.eco/) server at the following endpoint:~~
 
 ~~`http://localhost:9666/gun`~~
+
+Browsers cannot connect to websockets on localhost.
 
 ### src
 
