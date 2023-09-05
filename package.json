@@ -1,5 +1,5 @@
 {
-  "name": "src",
+  "name": "ctx",
   "version": "0.1.0",
   "description": "an api",
   "main": "index.js",

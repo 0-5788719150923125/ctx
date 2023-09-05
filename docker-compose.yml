@@ -1,8 +1,8 @@
 version: '3.9'
 
 services:
-  api:
-    image: ghcr.io/0-5788719150923125/src:latest
+  ctx:
+    image: ghcr.io/0-5788719150923125/ctx:latest
     build:
       context: .
       dockerfile: Dockerfile
