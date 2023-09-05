@@ -12,4 +12,4 @@ services:
       WEBUI: enabled
       ANONYMOUS: 'true'
     ports:
-      - 9667:9666
+      - 9668:9666

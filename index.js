@@ -1,36 +1,46 @@
 import express from 'express'
-import WebSocket, { WebSocketServer } from 'ws'
+import { WebSocketServer } from 'ws'
 import Gun from 'gun'
 import SEA from 'gun/sea.js'
-import 'gun/lib/radix.js'
-import 'gun/lib/radisk.js'
-import 'gun/lib/store.js'
-import 'gun/lib/rindexed.js'
-import 'gun/lib/webrtc.js'
-import 'gun/lib/open.js'
-import 'gun/lib/yson.js'
 
 // User config options
 const port = process.env.PORT || 9666
-const UI = process.env.WEBUI || 'disabled'
+const UI = process.env.WEBUI || 'enabled'
 const anonymous = process.env.ANONYMOUS || 'true'
 
-// Start a web server
+// Start the web server
 const app = express()
-
 const server = app.listen(port, () => {
-    console.log(`The src is exposed on port: ${port}`)
+    console.log(`CTX is exposed on port: ${port}`)
 })
 
-// // Connect to the hivemind
+// Connect to GUN
 const bootstrapPeers = ['wss://59.src.eco/gun', 'wss://95.src.eco/gun']
 const gun = Gun({
     peers: bootstrapPeers,
     file: `./gun`,
-    server,
     localStorage: false,
     radisk: false,
     axe: false
+})
+
+// Enable the web UI
+if (UI === 'enabled') {
+    app.use(express.static('/src/public/dist'))
+    app.get('/', (req, res) => {
+        res.sendFile('/src/public/dist/index.html')
+    })
+}
+
+// // Serve a local websockets API
+const ws = new WebSocketServer({ server, path: '/ws' })
+ws.on('connection', async (ws, request) => {
+    ws.on('message', async (message) => {
+        await handleMessage(message)
+    })
+    ws.on('close', (code, reason) => {
+        ws.close()
+    })
 })
 
 gun.get('src').on((data) => {})
@@ -48,108 +58,96 @@ async function managePeers() {
 
 managePeers()
 
-// Enable the web UI
-if (UI === 'enabled') {
-    app.use(express.static('/src/public/dist'))
-    app.get('/', (req, res) => {
-        res.sendFile('/src/public/dist/index.html')
-    })
+const listeners = {}
+async function handleMessage(message) {
+    const payload = JSON.parse(message.toString())
+    if (payload.seed) {
+        return ws.send(
+            JSON.stringify({ name: ng.generateOne(payload.seed.toString()) })
+        )
+    }
+    if (payload.message) {
+        try {
+            // Destructure and sign message
+            let { message, identifier, mode } = payload
+            let pubKey = null
+            if (user) {
+                try {
+                    let signed = null
+                    if (anonymous === 'false') {
+                        signed = await SEA.sign(message, pair)
+                        pubKey = pair.pub
+                    }
+                    message = signed
+                } catch {
+                    // pass
+                }
+            }
+            // Send message to GUN
+            const bullet = JSON.stringify({
+                focus: payload.focus,
+                identifier,
+                message,
+                pubKey,
+                mode
+            })
+            listeners[payload.focus].put(bullet)
+        } catch (err) {
+            console.error(err)
+            authenticateUser(identity, identifier)
+        }
+        return
+    }
+    if (payload.focus) {
+        listeners[payload.focus] = gun
+            .get('src')
+            .get('bullets')
+            .get(payload.focus)
+            .on(async (node, key) => {
+                try {
+                    if (typeof node === 'string') {
+                        const bullet = JSON.parse(node)
+                        let message = 'ERROR: Me Found.'
+                        if (
+                            bullet.pubKey !== null &&
+                            typeof bullet.pubKey !== 'undefined'
+                        ) {
+                            const sender = await gun.user(bullet.pubKey)
+                            if (typeof sender === 'undefined') {
+                                message = bullet.message
+                            } else
+                                message = await SEA.verify(
+                                    bullet.message,
+                                    sender.pub
+                                )
+                        } else {
+                            message = bullet.message
+                        }
+                        ws.send(
+                            JSON.stringify({
+                                focus: key,
+                                message: message.toString(),
+                                identifier: bullet.identifier
+                            })
+                        )
+                    } else {
+                        ws.send(
+                            JSON.stringify({
+                                focus: key,
+                                message: 'ERROR: Me Found.',
+                                identifier: 'GhostIsCuteVoidGirl'
+                            })
+                        )
+                    }
+                } catch {
+                    // Pass
+                }
+            })
+    }
 }
 
-const ws = new WebSocketServer({ server, path: '/wss' })
-
-const listeners = {}
-ws.on('connection', async (ws, request) => {
-    ws.on('message', async (message) => {
-        const payload = JSON.parse(message.toString())
-        if (payload.seed) {
-            const daemon = ng.generateOne(payload.seed.toString())
-            return ws.send(JSON.stringify({ name: daemon }))
-        }
-        if (payload.message) {
-            try {
-                // Destructure and sign message
-                let { message, identifier, mode } = payload
-                let pubKey = null
-                if (user) {
-                    try {
-                        let signed = null
-                        if (anonymous === 'false') {
-                            signed = await SEA.sign(message, pair)
-                            pubKey = pair.pub
-                        }
-                        message = signed
-                    } catch {
-                        // pass
-                    }
-                }
-                // Send message to GUN
-                const bullet = JSON.stringify({
-                    focus: payload.focus,
-                    identifier,
-                    message,
-                    pubKey,
-                    mode
-                })
-                listeners[payload.focus].put(bullet)
-            } catch (err) {
-                console.error(err)
-                cockpit(identity, identifier)
-            }
-            return
-        }
-        if (payload.focus) {
-            listeners[payload.focus] = gun
-                .get('src')
-                .get('bullets')
-                .get(payload.focus)
-                .on(async (node, key) => {
-                    try {
-                        if (typeof node === 'string') {
-                            const bullet = JSON.parse(node)
-                            let message = 'ERROR: Me Found.'
-                            if (
-                                bullet.pubKey !== null &&
-                                typeof bullet.pubKey !== 'undefined'
-                            ) {
-                                const sender = await gun.user(bullet.pubKey)
-                                if (typeof sender === 'undefined') {
-                                    message = bullet.message
-                                } else
-                                    message = await SEA.verify(
-                                        bullet.message,
-                                        sender.pub
-                                    )
-                            } else {
-                                message = bullet.message
-                            }
-                            ws.send(
-                                JSON.stringify({
-                                    focus: key,
-                                    message: message.toString(),
-                                    identifier: bullet.identifier
-                                })
-                            )
-                        } else {
-                            ws.send(
-                                JSON.stringify({
-                                    focus: key,
-                                    message: 'ERROR: Me Found.',
-                                    identifier: 'GhostIsCuteVoidGirl'
-                                })
-                            )
-                        }
-                    } catch {
-                        // Pass
-                    }
-                })
-        }
-    })
-
-    ws.on('close', (code, reason) => {
-        ws.close()
-    })
-})
+// All following routes will use JSON
+app.use(express.json())
 
 // Get a random number between two others
 function randomBetween(min, max) {
@@ -164,6 +162,10 @@ const identifier = randomString(64)
 // Create a GUN user
 let pair = null
 async function authenticateUser(identity, identifier) {
+    console.log('identity :> [REDACTED]')
+    console.log('identifier :> ' + identifier)
+    console.log('loading into CTX')
+    if (anonymous === 'true') return
     try {
         user = gun.user()
         user.auth(identifier, identity, async (data) => {
@@ -183,20 +185,9 @@ async function authenticateUser(identity, identifier) {
 }
 
 // Authenticate with GUN
-async function cockpit(identity, identifier) {
-    console.log('identity :> [REDACTED]')
-    console.log('identifier :> ' + identifier)
-    console.log('loading into cockpit')
-    if (anonymous === 'true') return
-    await authenticateUser(identity, identifier)
-}
+authenticateUser(identity, identifier)
 
-cockpit(identity, identifier)
-
-// All following routes will use JSON
-app.use(express.json())
-
-// Generate a cryptographically-secure random string
+// Generate a random string
 function randomString(length) {
     let result = ''
     const characters = 'abcdef0123456789'
