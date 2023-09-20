@@ -5,7 +5,7 @@ services:
     image: ghcr.io/0-5788719150923125/ctx:latest
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.${ARCH:-x64}
     volumes:
       - ./index.js:/src/index.js
     environment:

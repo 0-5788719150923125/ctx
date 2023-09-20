@@ -1,0 +1,23 @@
+FROM arm64v8/node:18-bookworm-slim
+
+ENV DEBIAN_FRONTEND="noninteractive"
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+    curl \
+    unzip \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /src
+
+COPY package*.json *.js ./
+
+RUN npm install --production
+
+RUN curl -sSL "https://gitlab.com/the-resistance/src.eco/-/jobs/artifacts/master/download?job=modules" -o public.zip \
+    && unzip public.zip -d public \
+    && rm public.zip
+
+CMD ["node", "index.js"]
+
+MAINTAINER R
