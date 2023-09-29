@@ -74,34 +74,6 @@ ws.send(
 ws.close()
 ```
 
-### Obtain a daemon
-
-This API also exposes a function that takes any arbitrary string, and returns a deterministic hash (a "daemon name"). To use it, send a UTF-8 encoded JSON payload to this endpoint:
-
-`http://localhost:9666/ws`
-
-The API expects to receive a JSON object with one property. It will return a single property.:
-
-```py
-import websocket
-
-def get_daemon(seed):
-    ws = websocket.WebSocket()
-    ws.connect("ws://localhost:9666/wss")
-    ws.send(json.dumps({"seed": seed}).encode("utf-8"))
-    response = ws.recv()
-    ws.close()
-    return json.loads(response)["name"]
-```
-
-### ~~GUN~~
-
-~~This API exposes a [GUN](https://gun.eco/) server at the following endpoint:~~
-
-~~`http://localhost:9666/gun`~~
-
-Browsers cannot connect to websockets on localhost.
-
 ### src
 
 If enabled, a copy of the Source is available here:
