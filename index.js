@@ -7,6 +7,7 @@ import SEA from 'gun/sea.js'
 const port = process.env.PORT || 9666
 const UI = process.env.WEBUI || 'enabled'
 const anonymous = process.env.ANONYMOUS || 'true'
+let pair = null
 
 // Start the web server
 const app = express()
@@ -20,7 +21,7 @@ const gun = Gun({
     peers: bootstrapPeers,
     file: `./gun`,
     localStorage: false,
-    radisk: false,
+    radisk: true,
     axe: false
 })
 
@@ -154,39 +155,6 @@ function randomBetween(min, max) {
     return Math.floor(Math.random() * (max - min) + min)
 }
 
-// Generate credentials
-let user = null
-const identity = randomString(randomBetween(96, 128))
-const identifier = randomString(64)
-
-// Create a GUN user
-let pair = null
-async function authenticateUser(identity, identifier) {
-    console.log('identity :> [REDACTED]')
-    console.log('identifier :> ' + identifier)
-    console.log('loading into CTX')
-    if (anonymous === 'true') return
-    try {
-        user = gun.user()
-        user.auth(identifier, identity, async (data) => {
-            if (data.err) {
-                user.create(identifier, identity, async (data) => {
-                    console.log('Creating GUN user: ~' + data.pub)
-                    await authenticateUser(identity, identifier)
-                })
-            } else {
-                pair = user.pair()
-                console.log('Authenticated GUN user: ~' + pair.pub)
-            }
-        })
-    } catch (err) {
-        console.error(err)
-    }
-}
-
-// Authenticate with GUN
-authenticateUser(identity, identifier)
-
 // Generate a random string
 function randomString(length) {
     let result = ''
@@ -201,3 +169,30 @@ function randomString(length) {
     }
     return result
 }
+
+// Generate credentials
+let user = null
+const identity = randomString(randomBetween(96, 128))
+let identifier = randomString(64)
+
+// Create a GUN user
+async function authenticateUser(identity, identifier) {
+    console.log('identity :> [REDACTED]')
+    identifier = randomString(64)
+    console.log('identifier :> ' + identifier)
+    if (anonymous === 'true') return
+    console.log('authenticating with CTX')
+    try {
+        user = gun.user()
+        user.create(identifier, identity, async (data) => {
+            console.log('Creating GUN user: ~' + data.pub)
+        })
+        pair = user.pair()
+        console.log('Connected.')
+    } catch (err) {
+        console.error(err)
+    }
+}
+
+// Authenticate with GUN
+authenticateUser(identity, identifier)

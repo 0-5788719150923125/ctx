@@ -1,7 +1,7 @@
 version: '3.9'
 
 services:
-  ctx:
+  api:
     image: ghcr.io/0-5788719150923125/ctx:latest
     build:
       context: .
@@ -10,6 +10,6 @@ services:
       - ./index.js:/src/index.js
     environment:
       WEBUI: enabled
-      ANONYMOUS: 'true'
+      ANONYMOUS: 'false'
     ports:
-      - 9668:9666
+      - 9666:9666
