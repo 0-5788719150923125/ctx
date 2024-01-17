@@ -8,8 +8,9 @@ services:
       dockerfile: Dockerfile.${ARCH:-x64}
     volumes:
       - ./index.js:/src/index.js
+    network_mode: host
     environment:
       WEBUI: enabled
-      ANONYMOUS: 'false'
+      ANONYMOUS: 'true'
     ports:
-      - 9666:9666
+      - 9668:9666

@@ -1,10 +1,12 @@
+import { execSync } from 'child_process'
 import express from 'express'
 import { WebSocketServer } from 'ws'
 import Gun from 'gun'
 import SEA from 'gun/sea.js'
+import 'gun/lib/webrtc.js'
 
 // User config options
-const port = process.env.PORT || 9666
+const port = process.env.PORT || 9668
 const UI = process.env.WEBUI || 'enabled'
 const anonymous = process.env.ANONYMOUS || 'true'
 let pair = null
@@ -27,10 +29,21 @@ const gun = Gun({
 
 // Enable the web UI
 if (UI === 'enabled') {
-    app.use(express.static('/src/public/dist'))
-    app.get('/', (req, res) => {
-        res.sendFile('/src/public/dist/index.html')
-    })
+    try {
+        execSync('rm -rf dist/*')
+        execSync(
+            'curl -sSL "https://gitlab.com/the-resistance/src.eco/-/jobs/5759914351/artifacts/download?file_type=archive" -o public.zip'
+        )
+        execSync('unzip public.zip -d dist')
+        execSync('rm public.zip')
+        app.use(express.static('/src/dist/public'))
+        app.get('/', (req, res) => {
+            res.sendFile('/src/dist/public/index.html')
+        })
+        console.log('Webserver bootstrap success: http://localhost:9666')
+    } catch (error) {
+        console.error('Error during webserver bootstrap:', error)
+    }
 }
 
 // // Serve a local websockets API
@@ -49,6 +62,7 @@ gun.get('src').on((data) => {})
 async function managePeers() {
     const peers = gun.back('opt.peers')
     for (const i of bootstrapPeers) {
+        console.log(peers[i])
         const state = peers[i]?.wire?.readyState
         if (state === 0 || state === null || typeof state === 'undefined') {
             gun.opt({ peers: [...bootstrapPeers] })
