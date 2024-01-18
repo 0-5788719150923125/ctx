@@ -6,7 +6,7 @@ import SEA from 'gun/sea.js'
 import 'gun/lib/webrtc.js'
 
 // User config options
-const port = process.env.PORT || 9668
+const port = process.env.PORT || 9666
 const UI = process.env.WEBUI || 'enabled'
 const anonymous = process.env.ANONYMOUS || 'true'
 let pair = null
