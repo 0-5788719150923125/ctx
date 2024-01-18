@@ -11,6 +11,6 @@ services:
     network_mode: host
     environment:
       WEBUI: enabled
-      ANONYMOUS: 'true'
+      ANONYMOUS: 'false'
     ports:
       - 9668:9666

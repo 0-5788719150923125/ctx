@@ -198,11 +198,10 @@ async function authenticateUser(identity, identifier) {
     console.log('authenticating with CTX')
     try {
         user = gun.user()
-        user.create(identifier, identity, async (data) => {
-            console.log('Creating GUN user: ~' + data.pub)
-        })
         pair = user.pair()
-        console.log('Connected.')
+        user.create(identifier, identity, async (data) => {
+            console.log('Created new GUN user: ~' + data.pub)
+        })
     } catch (err) {
         console.error(err)
     }
