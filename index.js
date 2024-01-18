@@ -62,7 +62,6 @@ gun.get('src').on((data) => {})
 async function managePeers() {
     const peers = gun.back('opt.peers')
     for (const i of bootstrapPeers) {
-        console.log(peers[i])
         const state = peers[i]?.wire?.readyState
         if (state === 0 || state === null || typeof state === 'undefined') {
             gun.opt({ peers: [...bootstrapPeers] })
